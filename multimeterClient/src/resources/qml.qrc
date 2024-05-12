@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>qml/ChannelLabel.qml</file>
+        <file>qml/Header.qml</file>
+        <file>qml/MeasureButton.qml</file>
+        <file>qml/RangeSelector.qml</file>
+        <file>qml/ValueBox.qml</file>
+        <file>qml/StateBox.qml</file>
+        <file>img/busy.svg</file>
+        <file>img/error.svg</file>
+        <file>img/idle.svg</file>
+        <file>img/measure.svg</file>
+        <file>img/settings.svg</file>
+        <file>qml/Channel.qml</file>
+        <file>qml/MenuBox.qml</file>
+        <file>img/disconn.svg</file>
+        <file>qml/RangeItem.qml</file>
+    </qresource>
+</RCC>
