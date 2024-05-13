@@ -23,6 +23,9 @@
 Рис. 2 Все каналы готовы к работе  
 [![client-idle.png](https://i.postimg.cc/tTtLjk7y/client-idle.png)](https://postimg.cc/N9FN811P)
 
+Рис. 3 Каналы с активированным процессом измерения и получения данных  
+[![client-measure.png](https://i.postimg.cc/fTg1DJW3/client-measure.png)](https://postimg.cc/D8LxcfXF)
+
 ### Контролер канала
 
 Каждый контролер подсвечивается цветом, позволяющим быстро определить текущее состояние канала. 
