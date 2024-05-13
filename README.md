@@ -26,6 +26,9 @@
 Рис. 3 Каналы с активированным процессом измерения и получения данных  
 [![client-measure.png](https://i.postimg.cc/fTg1DJW3/client-measure.png)](https://postimg.cc/D8LxcfXF)
 
+Рис. 4 Каналы в состоянии ошибки или занятости  
+[![client-on-Data2.png](https://i.postimg.cc/VLSD9416/client-on-Data2.png)](https://postimg.cc/qzTs4sNV)
+
 ### Контролер канала
 
 Каждый контролер подсвечивается цветом, позволяющим быстро определить текущее состояние канала. 
