@@ -63,7 +63,6 @@ Item
 
         onClicked: {
             if(rangeSelector.channelState === 0){
-//                rangeSelector.range = ownRange < 4 ? ownRange : 3
                 rangeSelector.selectorChangedRange( rangeSelector.channelId, rangeListDelegate.ownRange )
             }
         }

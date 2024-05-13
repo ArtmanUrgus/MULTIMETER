@@ -14,12 +14,12 @@ public:
     virtual ~MultimeterServer();
 
     void run();
-    void terminate();
+    void disconnect();
 
 private:
-
-    bool termianted{false};
-
     unordered_map< int, ClientHandler* > clients;
+
+    bool connected{false};
+
     int serverfileDescriptor{-1};
 };

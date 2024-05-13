@@ -2,11 +2,15 @@
 #include "RequestHandler.h"
 
 #include <sys/socket.h>
-#include <errno.h>
-#include <assert.h>
-#include <iostream>
 #include <unistd.h>
 #include <string.h>
+
+namespace
+{
+    constexpr uint16_t port{11047};
+    constexpr int maxBufferSize{65546};
+    constexpr int invalideValue{-1};
+}
 
 ClientHandler::ClientHandler(int id)
     : clientFileDescriptor{id}
@@ -20,24 +24,26 @@ ClientHandler::~ClientHandler()
     stop();
 }
 
-void ClientHandler::terminateConnection()
+void ClientHandler::disconnect()
 {
-    terminated = true;
+    connected = false;
 }
 
 void ClientHandler::run()
 {
-    while ( not terminated )
+    char messageBuffer[maxBufferSize];
+
+    while ( connected )
     {
         cout << "SERVER: Ожидание входящих сообщений от клиентов" << endl;
 
-        char messageBuffer[65546];
-        auto countOfRytesRead = recv( clientFileDescriptor, messageBuffer, 1024, 0 );
-
+        auto countOfRytesRead = recv( clientFileDescriptor, messageBuffer, maxBufferSize, 0 );
         if( countOfRytesRead <= 0 )
         {
             cout << "SERVER: Невозможно обработать сообщение от клиента с файловым дескриптором"
                  << clientFileDescriptor << endl;
+            stop();
+            break;
         }
 
         RequestHandler command;
@@ -50,10 +56,9 @@ void ClientHandler::run()
             }
 
             strncpy( messageBuffer, response.c_str(), sizeof(response) );
+            send( clientFileDescriptor, messageBuffer, countOfRytesRead, 0 );
 
             cout << "SERVER: Клиенту отправлено сообщение " << messageBuffer << endl;
-
-            send( clientFileDescriptor, messageBuffer, countOfRytesRead, 0 );
         }
         else
         {
@@ -65,9 +70,12 @@ void ClientHandler::run()
 
 void ClientHandler::stop()
 {
-    std::cout << "SERVER: Клиент с файловым дескриптором " << clientFileDescriptor << " завершил сеанс" << std::endl;
+    if( connected ) connected = false;
 
     char message[] = "exit\n";
+
     send( clientFileDescriptor, message, sizeof(message), 0 );
     close( clientFileDescriptor );
+
+    std::cout << "SERVER: Клиент с файловым дескриптором " << clientFileDescriptor << " завершил сеанс" << std::endl;
 }

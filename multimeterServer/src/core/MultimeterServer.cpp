@@ -2,42 +2,29 @@
 #include "MultimeterDispatcher.h"
 #include "ClientHandler.h"
 
-#include <sys/eventfd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-
 #include <unistd.h>
-#include <poll.h>
 #include <netinet/in.h>
-#include <cassert>
-#include <vector>
-#include <unordered_map>
-#include <iostream>
-#include <string.h>
-#include <errno.h>
 
 namespace
 {
     constexpr int maxNumberOfPendingConnections{100};
+    constexpr int maxBufferSize{65546};
     constexpr int invalideValue{-1};
     constexpr uint16_t port{11047};
 }
 
 MultimeterServer::MultimeterServer()
-{
-
-}
+{}
 
 MultimeterServer::~MultimeterServer()
 {
-    terminate();
+    disconnect();
     sleep(1);
     close(serverfileDescriptor);
 
     for(auto const& c : clients)
     {
-        c.second->terminateConnection();
+        c.second->disconnect();
         sleep(1);
         c.second->stop();
         delete c.second;
@@ -46,14 +33,14 @@ MultimeterServer::~MultimeterServer()
     clients.clear();
 }
 
-void MultimeterServer::terminate()
+void MultimeterServer::disconnect()
 {
-    termianted = true;
+    connected = false;
 }
 
 void MultimeterServer::run()
 {
-    char messageBuffer[1024];
+    char messageBuffer[maxBufferSize];
 
     int clientFileDescriptor{invalideValue};
     int countOfRytesRead{invalideValue};
@@ -64,30 +51,33 @@ void MultimeterServer::run()
     {
         cout << "SERVER: Невозможно открыть сокет сервера " << endl;
         cout << "SERVER: Функция socket() вернула ошибку " << errno << endl;
-        exit(1);
     }
 
     serverAddres.sin_family = AF_INET;
     serverAddres.sin_port = htons( port );
     serverAddres.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if( bind(serverfileDescriptor, (struct sockaddr *)&serverAddres, sizeof(serverAddres)) <= invalideValue )
+    while( not connected )
     {
-        cout << "SERVER: Невозможно установить соединение для сокета сервера " << serverfileDescriptor << endl;
-        cout << "SERVER: Функция bind() вернула ошибку " << errno << endl;
-        exit(1);
+        if( bind(serverfileDescriptor, (struct sockaddr *)&serverAddres, sizeof(serverAddres)) <= invalideValue )
+        {
+            cout << "SERVER: Невозможно установить соединение для сокета сервера c дескриптором " << serverfileDescriptor << endl;
+            cout << "SERVER: Функция bind() вернула ошибку " << errno << endl;
+        }
+        else
+            connected = true;
     }
 
-    if( listen(serverfileDescriptor, maxNumberOfPendingConnections) <= invalideValue )
+    auto bindResult = listen(serverfileDescriptor, maxNumberOfPendingConnections);
+    if( bindResult <= invalideValue )
     {
         cout << "SERVER: Невозможно обеспечить соединение клентов к дескриптору " << serverfileDescriptor << endl;
         cout << "SERVER: Функция listen() вернула ошибку " << errno << endl;
-        exit(1);
     }
 
     cout << "SERVER: Службы unix-domain-socket-сервера успешно запущены и ожидают соединения с клиентом" << endl;
 
-    while( not termianted )
+    while( connected )
     {
         if( clientFileDescriptor = accept(serverfileDescriptor, nullptr, nullptr );
             clientFileDescriptor > invalideValue )

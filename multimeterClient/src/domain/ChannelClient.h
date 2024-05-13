@@ -3,7 +3,8 @@
 #include "ChannelDispatcher.h"
 #include <QTimer>
 #include <QThread>
-#include <thread>
+
+using namespace std;
 
 class ChannelClient
 {
@@ -12,17 +13,22 @@ public :
     ~ChannelClient();
 
     void sendCommandToServer( QString const& );
-    void disconnect();
     void stop();
+
+public slots:
+    void start();
 
 private:
     void waitForResponse();
     void run();
 
+    ChannelDispatcher* dispatcher{nullptr};
+
     QThread* clientThread{nullptr};
+    QTimer connectionTimer;
+
     bool connected{false};
+
     int clientFileDescriptor{-1};
     int channelId{-1};
-    QTimer connectionTimer;
-    ChannelDispatcher* dispatcher{nullptr};
 };

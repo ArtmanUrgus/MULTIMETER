@@ -11,12 +11,12 @@ public:
     ClientHandler(int id);
     ~ClientHandler();
 
-    void terminateConnection();
+    void disconnect();
     void run();
     void stop();
 
 private:
     std::thread clientThread;
     int clientFileDescriptor{-1};
-    bool terminated{false};
+    bool connected{true};
 };

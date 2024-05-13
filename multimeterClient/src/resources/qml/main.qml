@@ -7,8 +7,13 @@ import org.ChannelData 1.0
 Window {
     width: 954
     height: 674
+    maximumHeight: height
+    maximumWidth: width
+    minimumHeight: height
+    minimumWidth: width
     visible: true
     title: qsTr("Multimeter")
+
 
     Header{
         objectName: "Header"

@@ -53,27 +53,27 @@ public slots:
     void setRange(int);
     void setStatus(int);
     void setValue(QVector<float> const&);
-
-    void testSlot();
+    void setDisconneted();
+    void close();
 
 signals:
     void rangeChanged(int channel, int range);
     void statusChanged(int channel, int state);
     void valueChanged(int channel, float value);
 
-    void termiante();
-
 private slots:
     void disconectChannel();
 
 private:
-    int chId{-1};
-    int channelRange{Unus};
-    int channelStatus{Disconnected};
-    QVector<float> channelResultValue;
     ChannelClient* channelClient{nullptr};
+
+    QVector<float> channelResultValue;
     QString lastCommandRequested{""};
     QTimer statusRequestTimer;
     QTimer dataRequestTimer;
+
+    int chId{-1};
+    int channelRange{Kilo};
+    int channelStatus{Disconnected};
 };
 

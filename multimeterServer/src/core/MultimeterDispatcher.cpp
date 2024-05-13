@@ -1,16 +1,6 @@
 #include "MultimeterDispatcher.h"
 
-#include <unistd.h>
-#include <iostream>
-#include <chrono>
-#include <vector>
-#include <thread>
-#include <future>
-#include <unordered_map>
 #include <bits/stdc++.h>
-#include <string.h>
-#include <math.h>
-#include <pthread.h>
 
 namespace
 {
@@ -23,20 +13,22 @@ namespace
 
     constexpr int numberOfChannels{12};
     constexpr int rangeMicro{3};
-
-    constexpr double Pi = 3.14159265358979323846264338327950288419717;
+    constexpr double Pi{3.14159265358979323846264338327950288419717};
     constexpr double Deg2Rad = Pi / 180;
-    constexpr int pointCount = 380;
-    constexpr int teiler = 90;
-    constexpr int middleSinValue = 500;
-    constexpr int unos = 2;
-    constexpr int mili = 3;
-    constexpr int decimalsForMili = 6;
-    constexpr int decimalsForMicro = 3;
+    constexpr int pointCount{380};
+    constexpr int teiler{90};
+    constexpr int middleSinValue{500};
+    constexpr int unos{2};
+    constexpr int mili{3};
+    constexpr int noDecimals{0};
+    constexpr int decimalsForMili{6};
+    constexpr int decimalsForMicro{3};
+    constexpr int e{10};
+    constexpr int invalidValue{-1};
 
     inline float roundValue(float value, int decimalPlaces)
     {
-        return roundf(value * pow(10, decimalPlaces)) / pow(10, decimalPlaces);
+        return roundf(value * pow(e, decimalPlaces)) / pow(e, decimalPlaces);
     }
 }
 
@@ -48,9 +40,7 @@ public:
         : channelId{ id }
     {
         srand(static_cast<unsigned int>( std::time(nullptr) * channelId ));
-        changeStatusTimer = rand() % 100;
-
-        cout << channelId << " changeStatusTimer " << changeStatusTimer << endl;
+        runAfter( chrono::seconds(rand() % 100) );
 
         futureObj = exitSignal.get_future();
         channelThread = thread( &Channel::threadProzess, this );
@@ -69,6 +59,9 @@ public:
 
                 for (int i = 0; i < pointCount; i++)
                 {
+                    if(not measuring)
+                        break;
+
                     float v = std::sin((i - teiler) * Deg2Rad) * middleSinValue + yOffset;
                     v = v * measuringRangeFactor.at(selectedRange);
                     auto rounding = selectedRange >= unos ? (selectedRange == mili ? decimalsForMili : decimalsForMicro) : 0;
@@ -77,20 +70,29 @@ public:
                     measuringData.push_back( v );
 
                     this_thread::sleep_for(std::chrono::milliseconds(250));
-                    if(counter == changeStatusTimer)
-                    {
-                        state = ChannelState((rand() % 3) + 1);
-
-                        changeStatusTimer = rand() % 7;
-                        counter = 0;
-                    }
-                    counter++;
                 }
 
                 measuring = false;
                 state = Idle;
             }
         }
+    }
+
+    void setStatus()
+    {
+        state = ChannelState((rand() % 3) + 1);
+    }
+
+    void runAfter(chrono::seconds delay )
+    {
+        thread( [&]() {
+            this_thread::sleep_for( chrono::seconds( delay ) );
+            if( measuring )
+            {
+                setStatus();
+                runAfter(chrono::seconds(rand() % 10));
+            }
+        }).detach();
     }
 
     vector<float> data()
@@ -125,7 +127,6 @@ public:
         {
            measuring = v;
            state = measuring ? Measuring : Idle;
-           if( not measuring )exitSignal.set_value();
            return true;
         }
         return false;
@@ -133,21 +134,22 @@ public:
 
     void stop()
     {
-        exitSignal.set_value();
+        setMeasuring(false);
     }
 
 private:
+
     vector<float> measuringData;
     vector<float> measuringRangeFactor{ 1000.0, 1.0, 0.001, 0.000001 };
     ChannelState state{ Idle };
     thread channelThread;
     int channelId{ -1 };
-    int selectedRange{ 2 };
+    int selectedRange{ 1 };
     int counter{0};
     bool measuring{ false };
     promise <void> exitSignal;
     future<void> futureObj;
-    int changeStatusTimer{-1};
+    int changeStatusTimer{ -1 };
 };
 
 MultimeterDispatcher::MultimeterDispatcher()

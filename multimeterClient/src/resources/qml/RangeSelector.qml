@@ -12,7 +12,7 @@ Rectangle {
 
     property int channelId: -1
     property int channelState: 5
-    property int range: 2
+    property int range: 1
     property string bgcolor: "#cccccc"
     property string fgcolor: "#808080"
 

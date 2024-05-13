@@ -18,7 +18,6 @@ public:
 
     void init();
 
-    void setMeasuringForChannel(int channelId, bool buttonState);
     void setStatusForChannel(int channel, int state);
     void setValueForChannel(int channel, double value);
     void setRangeForChannel(int channel, int value);
@@ -31,10 +30,11 @@ private:
     void initChannels();
     void initControls();
 
+    QGuiApplication* guiApp{nullptr};
+    QQuickWindow* mainWindow{nullptr};
     QQmlApplicationEngine engine;
+
     QVector<ChannelDispatcher*> channels;
     QVector<QHash<int, QObject*>> qmlControl;
     QList<QObject*> rootItems;
-    QQuickWindow* mainWindow{nullptr};
-    QGuiApplication *guiApp{nullptr};
 };

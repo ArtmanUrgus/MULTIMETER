@@ -1,10 +1,7 @@
 #include "RequestHandler.h"
 #include "MultimeterDispatcher.h"
 
-#include <iostream>
-#include <unordered_map>
 #include <bits/stdc++.h>
-#include <exception>
 
 using  messageHandler = string (*)(int);
 

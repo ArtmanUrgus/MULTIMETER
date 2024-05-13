@@ -115,15 +115,15 @@ MultimeterClientManager::MultimeterClientManager(QGuiApplication *app, QObject *
 }
 
 MultimeterClientManager::~MultimeterClientManager()
-{}
+{
+    for( auto& ch : channels )
+    {
+        ch->close();
+    }
+}
 
 void MultimeterClientManager::init()
 {}
-
-void MultimeterClientManager::setMeasuringForChannel(int channelId, bool state )
-{
-    //channels.at(channelId)->setStatus(state ? ChannelDispatcher::Measure : ChannelDispatcher::Idle);
-}
 
 void MultimeterClientManager::setStatusForChannel(int channel, int status)
 {
@@ -143,7 +143,7 @@ void MultimeterClientManager::setStatusForChannel(int channel, int status)
         qmlControl.at(channel)[StateBox]->setProperty("bgcolor", bgLabel[status] );
 
         qmlControl.at(channel)[MeasureButton]->setProperty("channelState", status );
-        qmlControl.at(channel)[MeasureButton]->setProperty("switched", status == ChannelDispatcher::Measure ? true : false );
+        qmlControl.at(channel)[MeasureButton]->setProperty("switched", status >= ChannelDispatcher::Measure ? true : false );
     }
 }
 
@@ -151,7 +151,10 @@ void MultimeterClientManager::setValueForChannel(int channel, double value)
 {
     if( channel >= 0 && channel < qmlControl.size() )
     {
-        qmlControl.at(channel)[ValueBox]->setProperty("value", QString::number(value) );
+        qmlControl.at(channel)[ValueBox]->setProperty("value",
+                                                      QString::number(value, 'f',
+                                                      channels.at(channel)->range() < 2 ? 1 :
+                                                              (channels.at(channel)->range() == 3 ? 6 : 3) ) );
     }
 }
 
