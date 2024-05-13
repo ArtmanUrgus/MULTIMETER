@@ -20,6 +20,9 @@
 Рис. 1 Ожидает соединения  
 [![client-disconn.png](https://i.postimg.cc/FHY5L0Cg/client-disconn.png)](https://postimg.cc/zyYcmHrV)
 
+Рис. 2 Все каналы готовы к работе  
+[![client-idle.png](https://i.postimg.cc/tTtLjk7y/client-idle.png)](https://postimg.cc/N9FN811P)
+
 ### Контролер канала
 
 Каждый контролер подсвечивается цветом, позволяющим быстро определить текущее состояние канала. 
