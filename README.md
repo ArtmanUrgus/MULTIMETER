@@ -31,7 +31,7 @@
 
 ## Архитектура и взаимодействие
 
-![architectur.png](https://postimg.cc/2btYy8K6)
+[architectur.png](https://postimg.cc/2btYy8K6)
 
 ### Дополнения к ТЗ
 
