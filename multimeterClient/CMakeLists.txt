@@ -21,8 +21,6 @@ set(PROJECT_SOURCES
         src/domain/ChannelDispatcher.cpp
         src/gui/MultimeterClientManager.h
         src/gui/MultimeterClientManager.cpp
-        src/gui/ChannelDataView.h
-        src/gui/ChannelDataView.cpp
         src/main.cpp
         src/resources/qml.qrc
 )

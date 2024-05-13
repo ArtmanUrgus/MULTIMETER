@@ -1,10 +1,10 @@
 #include "MultimeterClientManager.h"
 #include "../domain/ChannelDispatcher.h"
-#include "ChannelDataView.h"
 
 #include <QQmlContext>
 #include <QTimer>
 #include <QColor>
+#include <QQuickItem>
 
 namespace
 {
@@ -95,7 +95,6 @@ MultimeterClientManager::MultimeterClientManager(QGuiApplication *app, QObject *
     , guiApp{app}
 {
     initChannels();
-    qmlRegisterType<ChannelDataView>("org.ChannelData", 1, 0, "DataView");
 
     const QUrl url(mainUrl);
 

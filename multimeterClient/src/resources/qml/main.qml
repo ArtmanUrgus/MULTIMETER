@@ -2,8 +2,6 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
-import org.ChannelData 1.0
-
 Window {
     width: 954
     height: 674
