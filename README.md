@@ -67,7 +67,7 @@ Qt 5.15
 ```
 mkdir build  
 cd build  
-cmake <path/to/project/MULTIMETER>
+cmake ../
 cmake --build ./
 ```
 

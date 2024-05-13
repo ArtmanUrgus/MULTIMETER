@@ -40,11 +40,10 @@ public:
         : channelId{ id }
     {
         srand(static_cast<unsigned int>( std::time(nullptr) * channelId ));
-        runAfter( chrono::seconds(rand() % 100) );
-
         futureObj = exitSignal.get_future();
         channelThread = thread( &Channel::threadProzess, this );
         pthread_setname_np( channelThread.native_handle(), "MeasuringThread" );
+        changeStatusTimer = rand() % 100;
     }
 
     void threadProzess()
@@ -60,7 +59,16 @@ public:
                 for (int i = 0; i < pointCount; i++)
                 {
                     if(not measuring)
+                    {
+                        setStatus();
                         break;
+                    }
+
+                    if( i == changeStatusTimer )
+                    {
+                        setStatus();
+                        changeStatusTimer = rand() % 100;
+                    }
 
                     float v = std::sin((i - teiler) * Deg2Rad) * middleSinValue + yOffset;
                     v = v * measuringRangeFactor.at(selectedRange);
@@ -81,18 +89,6 @@ public:
     void setStatus()
     {
         state = ChannelState((rand() % 3) + 1);
-    }
-
-    void runAfter(chrono::seconds delay )
-    {
-        thread( [&]() {
-            this_thread::sleep_for( chrono::seconds( delay ) );
-            if( measuring )
-            {
-                setStatus();
-                runAfter(chrono::seconds(rand() % 10));
-            }
-        }).detach();
     }
 
     vector<float> data()
@@ -189,7 +185,8 @@ int MultimeterDispatcher::numberOfMultimeterChannel()
 
 string MultimeterDispatcher::dataFromChannel(int id)
 {
-    if ( channels.find( id ) != channels.end() )
+    if ( channels.find( id ) != channels.end() &&
+         channels[id]->channelState() == ChannelState::Measuring )
     {
         if( auto data = channels.at(id)->data(); data.size() > 1 )
         {

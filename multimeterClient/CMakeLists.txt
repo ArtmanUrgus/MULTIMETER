@@ -31,6 +31,8 @@ add_executable(multimeterClient
   ${PROJECT_SOURCES}
 )
 
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+
 target_compile_definitions(multimeterClient
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
