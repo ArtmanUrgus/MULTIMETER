@@ -43,7 +43,7 @@ public:
         futureObj = exitSignal.get_future();
         channelThread = thread( &Channel::threadProzess, this );
         pthread_setname_np( channelThread.native_handle(), "MeasuringThread" );
-        changeStatusTimer = rand() % 100;
+        changeStatusDelay = rand() % 100;
     }
 
     void threadProzess()
@@ -64,20 +64,19 @@ public:
                         break;
                     }
 
-                    if( i == changeStatusTimer )
-                    {
-                        setStatus();
-                        changeStatusTimer = rand() % 100;
-                    }
-
                     float v = std::sin((i - teiler) * Deg2Rad) * middleSinValue + yOffset;
                     v = v * measuringRangeFactor.at(selectedRange);
                     auto rounding = selectedRange >= unos ? (selectedRange == mili ? decimalsForMili : decimalsForMicro) : 0;
                     v = roundValue(v, rounding);
 
                     measuringData.push_back( v );
-
                     this_thread::sleep_for(std::chrono::milliseconds(250));
+
+                    if( i == changeStatusDelay )
+                    {
+                        setStatus();
+                        changeStatusDelay = rand() % 7;
+                    }
                 }
 
                 measuring = false;
@@ -145,7 +144,7 @@ private:
     bool measuring{ false };
     promise <void> exitSignal;
     future<void> futureObj;
-    int changeStatusTimer{ -1 };
+    int changeStatusDelay{ -1 };
 };
 
 MultimeterDispatcher::MultimeterDispatcher()
@@ -185,8 +184,7 @@ int MultimeterDispatcher::numberOfMultimeterChannel()
 
 string MultimeterDispatcher::dataFromChannel(int id)
 {
-    if ( channels.find( id ) != channels.end() &&
-         channels[id]->channelState() == ChannelState::Measuring )
+    if ( channels.find( id ) != channels.end() )
     {
         if( auto data = channels.at(id)->data(); data.size() > 1 )
         {

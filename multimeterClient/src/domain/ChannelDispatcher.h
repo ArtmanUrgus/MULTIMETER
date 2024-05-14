@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QVector>
 #include <QColor>
-#include <QTimer>
+#include <QHash>
 
 class ChannelClient;
 
@@ -38,8 +38,6 @@ public:
     ChannelDispatcher(int id, QObject *parent = nullptr);
     ~ChannelDispatcher();
 
-    void handleMessageFromChannel(QString const& msg);
-
     /* Q_PROPERTIES */
     Q_INVOKABLE int channelId();
     Q_INVOKABLE int range();
@@ -52,7 +50,7 @@ public:
 public slots:
     void setRange(int);
     void setStatus(int);
-    void setValue(QVector<float> const&);
+    void setValue(const float &);
     void setDisconneted();
     void close();
 
@@ -68,9 +66,6 @@ private:
     ChannelClient* channelClient{nullptr};
 
     QVector<float> channelResultValue;
-    QString lastCommandRequested{""};
-    QTimer statusRequestTimer;
-    QTimer dataRequestTimer;
 
     int chId{-1};
     int channelRange{Kilo};

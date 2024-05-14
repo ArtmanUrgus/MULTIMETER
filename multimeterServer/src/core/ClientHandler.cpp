@@ -35,6 +35,8 @@ void ClientHandler::run()
 
     while ( connected )
     {
+        cout << "SERVER: Ожидание входящих сообщений от клиентов" << endl;
+
         auto countOfRytesRead = recv( clientFileDescriptor, messageBuffer, maxBufferSize, 0 );
         if( countOfRytesRead <= 0 )
         {

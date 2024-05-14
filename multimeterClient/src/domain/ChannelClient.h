@@ -6,6 +6,8 @@
 
 using namespace std;
 
+class CommandHandler;
+
 class ChannelClient
 {
 public :
@@ -15,6 +17,8 @@ public :
     void sendCommandToServer( QString const& );
     void stop();
 
+    void request(QString const& command, QString const& argumens);
+
 public slots:
     void start();
 
@@ -23,9 +27,13 @@ private:
     void run();
 
     ChannelDispatcher* dispatcher{nullptr};
+    CommandHandler* commandHandler{nullptr};
 
     QThread* clientThread{nullptr};
+
     QTimer connectionTimer;
+    QTimer statusRequestTimer;
+    QTimer dataRequestTimer;
 
     bool connected{false};
 

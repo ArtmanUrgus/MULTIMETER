@@ -6,39 +6,11 @@
 #include <QObject>
 #include <QStringList>
 
-namespace
-{
-    constexpr int awaitingTime{500};
-    constexpr int requestState{0};
-    constexpr int requestFirstParameter{1};
-    constexpr int requestHasAtLeastOneParameter{2};
-
-    static QHash<QString, int> status{
-        {"idle_state", 0},
-        {"measure_state", 1},
-        {"busy_state", 2},
-        {"error_state", 3},
-    };
-}
-
 ChannelDispatcher::ChannelDispatcher(int id, QObject *parent)
     : QObject{parent}
     , chId{id}
     , channelClient{ new ChannelClient{this, id} }
-{
-    statusRequestTimer.setInterval(3000);
-    connect(&statusRequestTimer, &QTimer::timeout, this, [&]{
-        lastCommandRequested = QStringLiteral("get_status");
-        channelClient->sendCommandToServer( QString("%1 channel%2\n").arg(lastCommandRequested).arg(chId) );
-    });
-    statusRequestTimer.start();
-
-    dataRequestTimer.setInterval(1000);
-    connect(&dataRequestTimer, &QTimer::timeout, this, [&]{
-        lastCommandRequested = QStringLiteral("get_result");
-        channelClient->sendCommandToServer( QString("%1 channel%2\n").arg(lastCommandRequested).arg(chId) );
-    });
-}
+{}
 
 ChannelDispatcher::~ChannelDispatcher()
 {
@@ -49,78 +21,8 @@ void ChannelDispatcher::disconectChannel()
 {
     if( channelClient )
     {
-        channelClient->sendCommandToServer(QString("exit\n"));
-
-        QTimer::singleShot(awaitingTime, nullptr, [&](){
-            channelClient->stop();
-        } );
-
         delete channelClient;
         channelClient = nullptr;
-    }
-}
-
-void ChannelDispatcher::handleMessageFromChannel(const QString &msg)
-{
-    auto messageList = msg.trimmed().split(" ");
-
-    if( not messageList.isEmpty() )
-    {
-        for(auto& data : messageList)
-        {
-            data.remove(",");
-            data.remove("\n");
-        }
-
-        if( lastCommandRequested == "start_measure" )
-        {
-            if( messageList.at(requestState) == "fail" )
-            {
-                setStatus(ChannelDispatcher::Idle);
-            }
-            else
-                setStatus(ChannelDispatcher::Measure);
-        }
-        else if( lastCommandRequested == "stop_measure" )
-        {
-            if( messageList.at(requestState) == "ok" )
-                setStatus(ChannelDispatcher::Idle);
-            else
-                setStatus(ChannelDispatcher::Measure);
-        }
-        else if( lastCommandRequested == "get_status" )
-        {
-            if( messageList.at(requestState) == "ok" )
-                setStatus( status[messageList.at(1)] );
-        }
-        else if( lastCommandRequested == "set_range" )
-        {
-            if(messageList.size() == requestHasAtLeastOneParameter)
-            {
-                if( messageList.at(requestState) == "ok" &&
-                    messageList.at(requestFirstParameter).contains("range") )
-                    setRange( messageList[1].remove("range").toInt() );
-            }
-        }
-        else if( lastCommandRequested == "get_result" )
-        {
-            if( messageList.at(requestState) == "ok" )
-            {
-                messageList.pop_front();
-
-                QVector<float> result;
-                for( auto& value : messageList )
-                {
-                    bool converted{false};
-                    if( auto v = value.toFloat(&converted); converted )
-                        result.append( v );
-                }
-
-                setValue(result);
-            }
-        }
-
-        lastCommandRequested = QStringLiteral("");
     }
 }
 
@@ -146,36 +48,14 @@ float ChannelDispatcher::value()
 
 void ChannelDispatcher::submitRangeChangeRequest(int range)
 {
-    lastCommandRequested = QStringLiteral("set_range");
-    channelClient->sendCommandToServer( QString("%1 channel%2, range%3\n")
-                                        .arg(lastCommandRequested).arg(chId).arg(range) );
-
-    QTimer::singleShot(500, this, [&]{
-        lastCommandRequested = QStringLiteral("get_status");
-        channelClient->sendCommandToServer( QString("%1 channel%2\n")
-                                            .arg(lastCommandRequested).arg(chId) );
-    });
+    channelClient->request(QStringLiteral("set_range"), QString("channel%2, range%3")
+                           .arg(chId).arg(range) );
 }
 
 void ChannelDispatcher::submitMessureChangeRequest(bool measureState)
 {
-    lastCommandRequested = QString("%1_measure").arg( measureState ? "start" : "stop");
-    channelClient->sendCommandToServer( QString("%1 channel%2\n")
-                                        .arg( lastCommandRequested ).arg(chId) );
-
-    QTimer::singleShot(500, this, [&]{
-        lastCommandRequested = QStringLiteral("get_status");
-        channelClient->sendCommandToServer( QString("%1 channel%2\n")
-                                            .arg(lastCommandRequested).arg(chId) );
-    });
-
-    if(measureState)
-    {
-        dataRequestTimer.start();
-        return;
-    }
-
-    dataRequestTimer.stop();
+    auto command = QString("%1_measure").arg( measureState ? "start" : "stop");
+    channelClient->request(command, QString("channel%2").arg(chId) );
 }
 
 void ChannelDispatcher::setRange(int v)
@@ -196,16 +76,15 @@ void ChannelDispatcher::setStatus(int v)
     }
 }
 
-void ChannelDispatcher::setValue(const QVector<float> &v)
+void ChannelDispatcher::setValue(const float& v)
 {
-    channelResultValue = v;
-    emit valueChanged( chId, channelResultValue.last() );
+    emit valueChanged( chId, v );
 }
 
 void ChannelDispatcher::setDisconneted()
 {
     setRange(Kilo);
-    setValue(QVector<float>{0.0});
+    setValue(0.0);
     channelStatus = Disconnected;
     emit statusChanged( chId, channelStatus );
     QTimer::singleShot(1000, this, [&]{ channelClient->start(); } );

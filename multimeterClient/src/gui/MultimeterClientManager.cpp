@@ -95,7 +95,6 @@ MultimeterClientManager::MultimeterClientManager(QGuiApplication *app, QObject *
     , guiApp{app}
 {
     initChannels();
-
     const QUrl url(mainUrl);
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, guiApp, [url](QObject *obj, const QUrl &objUrl)
