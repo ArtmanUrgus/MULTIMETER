@@ -118,6 +118,7 @@ MultimeterClientManager::~MultimeterClientManager()
     {
         ch->close();
     }
+    qDeleteAll(channels);
 }
 
 void MultimeterClientManager::init()
