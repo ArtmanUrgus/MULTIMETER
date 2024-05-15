@@ -35,6 +35,10 @@ private:
     QQmlApplicationEngine engine;
 
     QVector<ChannelDispatcher*> channels;
+
+    // Агрегаты следующих контейнеров не требуют явного удаления в деструкторе
+    // потому, что являются дочерними объектами QQuickWindow и будут удалены по зарытию окна.
+
     QVector<QHash<int, QObject*>> qmlControl;
     QList<QObject*> rootItems;
 };
