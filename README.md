@@ -5,7 +5,7 @@
 
 ## Архитектура и взаимодействие
 
-[![architectur.png](https://i.postimg.cc/sxjgnMPp/architectur.png)](https://postimg.cc/2btYy8K6)
+[![architectur.png](https://i.postimg.cc/ZRjqzGqW/architectur.png)](https://postimg.cc/JDD8bdZ8)
 
 ## Сервер
 
