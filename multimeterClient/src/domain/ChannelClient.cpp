@@ -142,7 +142,9 @@ public:
     }
 
     ~CommandHandler()
-    {}
+    {
+        qDeleteAll(commands);
+    }
 
     void handleResponse(const QString &msg)
     {
