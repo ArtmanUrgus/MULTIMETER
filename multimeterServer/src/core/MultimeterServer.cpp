@@ -66,6 +66,8 @@ void MultimeterServer::run()
         }
         else
             connected = true;
+
+        cout << "SERVER: Службы unix-domain-socket-сервера успешно запущены и ожидают соединения с клиентом" << endl;
     }
 
     auto bindResult = listen(serverfileDescriptor, maxNumberOfPendingConnections);
@@ -73,9 +75,7 @@ void MultimeterServer::run()
     {
         cout << "SERVER: Невозможно обеспечить соединение клентов к дескриптору " << serverfileDescriptor << endl;
         cout << "SERVER: Функция listen() вернула ошибку " << errno << endl;
-    }
-
-    cout << "SERVER: Службы unix-domain-socket-сервера успешно запущены и ожидают соединения с клиентом" << endl;
+    }  
 
     while( connected )
     {
