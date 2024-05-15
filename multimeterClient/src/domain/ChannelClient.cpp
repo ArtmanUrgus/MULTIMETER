@@ -212,6 +212,9 @@ ChannelClient::~ChannelClient()
 
     clientThread->quit();
 
+    delete commandHandler;
+    commandHandler = nullptr;
+    
     delete clientThread;
     clientThread = nullptr;
 }
