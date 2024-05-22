@@ -36,6 +36,8 @@ public:
     string setRangeForChannel( int id, int range );
     string stopMeasuringInChannel( int id );
 
+    MultimeterDispatcher &operator=(const MultimeterDispatcher&) = delete;
+
 private:
     MultimeterDispatcher();
     ~MultimeterDispatcher();
