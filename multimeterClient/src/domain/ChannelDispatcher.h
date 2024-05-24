@@ -35,7 +35,7 @@ public:
         Error,
     };
 
-    ChannelDispatcher(int id, QObject *parent = nullptr);
+    ChannelDispatcher(int&& id, QObject *parent = nullptr);
     ~ChannelDispatcher();
 
     /* Q_PROPERTIES */
@@ -44,13 +44,13 @@ public:
     Q_INVOKABLE int state();
     Q_INVOKABLE float value();
 
-    void submitRangeChangeRequest(int);
-    void submitMessureChangeRequest(bool);
+    void submitRangeChangeRequest(int&&);
+    void submitMessureChangeRequest(bool&&);
 
 public slots:
     void setRange(int);
     void setStatus(int);
-    void setValue(const float &);
+    void setValue(float);
     void setDisconneted();
     void close();
 

@@ -36,7 +36,7 @@ class MultimeterDispatcher::Channel
 {
 public:
 
-    Channel( int id )
+    Channel( int&& id )
         : channelId{ id }
     {
         srand(static_cast<unsigned int>( std::time(nullptr) * channelId ));
@@ -173,7 +173,7 @@ void MultimeterDispatcher::initChannels()
 {
     for( int i = 0; i < numberOfChannels; i++ )
     {
-        channels[i] = new Channel(i);
+        channels[i] = new Channel(move(i));
     }
 }
 
@@ -182,7 +182,7 @@ int MultimeterDispatcher::numberOfMultimeterChannel()
     return numberOfChannels;
 }
 
-string MultimeterDispatcher::dataFromChannel(int id)
+string MultimeterDispatcher::dataFromChannel(int&& id)
 {
     if ( channels.find( id ) != channels.end() )
     {
@@ -205,7 +205,7 @@ string MultimeterDispatcher::dataFromChannel(int id)
     return "fail\n";
 }
 
-string MultimeterDispatcher::channelStatus(int id)
+string MultimeterDispatcher::channelStatus(int&& id)
 { 
     if ( channels.find( id ) != channels.end() )
     {
@@ -216,7 +216,7 @@ string MultimeterDispatcher::channelStatus(int id)
     return "fail\n";
 }
 
-string MultimeterDispatcher::startMeasuringInChannel(int id)
+string MultimeterDispatcher::startMeasuringInChannel(int&& id)
 {
     if( channels.at( id )->setMeasuring( true ) )
     {
@@ -226,7 +226,7 @@ string MultimeterDispatcher::startMeasuringInChannel(int id)
     return "fail\n";
 }
 
-string MultimeterDispatcher::setRangeForChannel(int id, int value)
+string MultimeterDispatcher::setRangeForChannel(int&& id, int&& value)
 {
     auto range = value > rangeMicro ? rangeMicro : value;
 
@@ -240,7 +240,7 @@ string MultimeterDispatcher::setRangeForChannel(int id, int value)
     return "fail\n";
 }
 
-string MultimeterDispatcher::stopMeasuringInChannel(int id)
+string MultimeterDispatcher::stopMeasuringInChannel(int&& id)
 {
     if( channels.at( id )->setMeasuring( false ) )
         return "ok\n";

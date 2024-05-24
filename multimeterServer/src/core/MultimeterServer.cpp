@@ -66,22 +66,23 @@ void MultimeterServer::run()
         }
         else
             connected = true;
-
-        cout << "SERVER: Службы unix-domain-socket-сервера успешно запущены и ожидают соединения с клиентом" << endl;
     }
 
-    if( listen(serverfileDescriptor, maxNumberOfPendingConnections) <= invalideValue )
+    auto bindResult = listen(serverfileDescriptor, maxNumberOfPendingConnections);
+    if( bindResult <= invalideValue )
     {
         cout << "SERVER: Невозможно обеспечить соединение клентов к дескриптору " << serverfileDescriptor << endl;
         cout << "SERVER: Функция listen() вернула ошибку " << errno << endl;
-    }  
+    }
+
+    cout << "SERVER: Службы unix-domain-socket-сервера успешно запущены и ожидают соединения с клиентом" << endl;
 
     while( connected )
     {
         if( clientFileDescriptor = accept(serverfileDescriptor, nullptr, nullptr );
             clientFileDescriptor > invalideValue )
         {
-            clients[ clientFileDescriptor ] = new ClientHandler{ clientFileDescriptor };
+            clients[ clientFileDescriptor ] = new ClientHandler{ move(clientFileDescriptor) };
         }
     }
 

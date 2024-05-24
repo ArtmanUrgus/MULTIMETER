@@ -14,7 +14,7 @@ public :
     explicit ChannelClient(ChannelDispatcher* parent, int channelId);
     ~ChannelClient();
 
-    void sendCommandToServer( QString const& );
+    void sendCommandToServer( string&& );
     void stop();
 
     void request(QString const& command, QString const& argumens);

@@ -12,7 +12,7 @@ namespace
     constexpr int invalideValue{-1};
 }
 
-ClientHandler::ClientHandler(int id)
+ClientHandler::ClientHandler(int&& id)
     : clientFileDescriptor{id}
 {
     clientThread = std::thread( [this]() { run(); } );
@@ -35,6 +35,8 @@ void ClientHandler::run()
 
     while ( connected )
     {
+        cout << "SERVER: Ожидание входящих сообщений от клиентов" << endl;
+
         auto countOfRytesRead = recv( clientFileDescriptor, messageBuffer, maxBufferSize, 0 );
         if( countOfRytesRead <= 0 )
         {
@@ -45,7 +47,7 @@ void ClientHandler::run()
         }
 
         RequestHandler command;
-        if( auto response = command.handleCommand( messageBuffer ); not response.empty() )
+        if( auto response = command.handleCommand( move(messageBuffer) ); not response.empty() )
         {
             if(response == "join")
             {

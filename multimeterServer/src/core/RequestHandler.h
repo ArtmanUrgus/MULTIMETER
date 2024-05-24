@@ -11,10 +11,10 @@ public:
     RequestHandler();
     ~RequestHandler();
 
-    string handleCommand( string value );
+    string handleCommand( string&& value );
 
 private:
-    void splitMessage( string value );
+    void splitMessage( string&& value );
 
     vector<string> data;
 };

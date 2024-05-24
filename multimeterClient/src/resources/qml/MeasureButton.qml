@@ -7,6 +7,7 @@ Item {
     property int channelState: -1
     property int channelId: -1
     property bool switched: false
+    property string stateColor: "#cccccc"
 
     width: 74; height: 36;
 
@@ -25,7 +26,12 @@ Item {
             y: 4
             width: 28; height: 28;
             radius: 14
-            color: measuringButton.switched ? "#0afd03" : "#cccccc"
+
+            Binding{
+                target: indicator
+                property: "color"
+                value: measuringButton.stateColor
+            }
         }
 
         Text {
@@ -36,7 +42,12 @@ Item {
             font.family: "Ubuntu Condensed"
             font.weight: Font.Bold
             font.pixelSize: 18
-            color: "#cccccc"
+
+            Binding{
+                target: statusLabel
+                property: "color"
+                value: measuringButton.stateColor
+            }
         }
 
         MouseArea {

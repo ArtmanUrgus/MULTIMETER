@@ -118,7 +118,6 @@ MultimeterClientManager::~MultimeterClientManager()
     {
         ch->close();
     }
-    qDeleteAll(channels);
 }
 
 void MultimeterClientManager::init()
@@ -143,6 +142,7 @@ void MultimeterClientManager::setStatusForChannel(int channel, int status)
 
         qmlControl.at(channel)[MeasureButton]->setProperty("channelState", status );
         qmlControl.at(channel)[MeasureButton]->setProperty("switched", status >= ChannelDispatcher::Measure ? true : false );
+        qmlControl.at(channel)[MeasureButton]->setProperty("stateColor", bgLabel[status] );
     }
 }
 
@@ -171,7 +171,7 @@ void MultimeterClientManager::submitRange(int channel, int value)
     {
         if( channel >= 0 && channel < channels.size() )
         {
-            channels.at(channel)->submitRangeChangeRequest(value);
+            channels.at(channel)->submitRangeChangeRequest(std::move(value));
         }
     }
 }
@@ -182,7 +182,7 @@ void MultimeterClientManager::submitMeasure(int channel, bool buttonState)
     {
         if( channel >= 0 && channel < channels.size() )
         {
-            channels.at(channel)->submitMessureChangeRequest(buttonState);
+            channels.at(channel)->submitMessureChangeRequest(std::move(buttonState));
         }
     }
 }
@@ -191,7 +191,7 @@ void MultimeterClientManager::initChannels()
 {
     for( int i = 0; i < maxChannelNumber; i++ )
     {
-        channels.append(new ChannelDispatcher{i});
+        channels.append(new ChannelDispatcher{std::move(i)});
 
         connect(channels.last(), &ChannelDispatcher::statusChanged,
                 this, &MultimeterClientManager::setStatusForChannel);

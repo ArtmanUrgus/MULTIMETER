@@ -84,7 +84,7 @@ namespace
         void handleResponse(QStringList& messageList) override final
         {
             if( messageList.at(requestState) == "ok" )
-                diapatcher->setStatus( status[messageList.at(1)] );
+                diapatcher->setStatus( std::move(status[messageList.at(1)]) );
         }
     };
 
@@ -98,7 +98,7 @@ namespace
             {
                 if( messageList.at(requestState) == "ok" &&
                     messageList.at(requestFirstParameter).contains("range") )
-                    diapatcher->setRange( messageList[1].remove("range").toInt() );
+                    diapatcher->setRange( std::move(messageList[1].remove("range").toInt()) );
             }
         }
     };
@@ -122,7 +122,7 @@ namespace
                 }
 
                 if( result.size() )
-                    diapatcher->setValue(result.last());
+                    diapatcher->setValue(std::move(result.last()));
             }
         }
     };
@@ -142,9 +142,7 @@ public:
     }
 
     ~CommandHandler()
-    {
-        qDeleteAll(commands);
-    }
+    {}
 
     void handleResponse(const QString &msg)
     {
@@ -194,7 +192,7 @@ ChannelClient::ChannelClient(ChannelDispatcher *parent, int id)
     {
         auto command = QStringLiteral("get_status");
         commandHandler->setLastCommand( command );
-        sendCommandToServer( QString("%1 channel%2\n").arg( command ).arg(channelId) );
+        sendCommandToServer( std::move(QString("%1 channel%2\n").arg( command ).arg(channelId).toStdString()) );
     });
     statusRequestTimer.start();
 
@@ -203,20 +201,17 @@ ChannelClient::ChannelClient(ChannelDispatcher *parent, int id)
     {
         auto command = QStringLiteral("get_result");
         commandHandler->setLastCommand( command );
-        sendCommandToServer( QString("%1 channel%2\n").arg( command ).arg(channelId) );
+        sendCommandToServer( std::move(QString("%1 channel%2\n").arg( command ).arg(channelId).toStdString()) );
     });
 }
 
 ChannelClient::~ChannelClient()
 {
-    sendCommandToServer(QString("exit\n"));
+    sendCommandToServer(std::move(QString("exit\n").toStdString()));
     stop();
 
     clientThread->quit();
 
-    delete commandHandler;
-    commandHandler = nullptr;
-    
     delete clientThread;
     clientThread = nullptr;
 }
@@ -252,12 +247,12 @@ void ChannelClient::run()
     qDebug() << "CLIENT: Cоединение с сервером установленно";
 }
 
-void ChannelClient::sendCommandToServer(const QString & command)
+void ChannelClient::sendCommandToServer(string&& command)
 {
     if(connected)
     {
         try {
-            string msg = command.toStdString();
+            string msg = command;
 
             char buf[sizeof(msg)];
             memset(buf, 0, sizeof(msg));
@@ -323,8 +318,8 @@ void ChannelClient::stop()
 void ChannelClient::request(const QString &command, const QString &argumens)
 {
     commandHandler->setLastCommand(command);
-    auto message = QString("%1 %2\n").arg(command).arg(argumens);
-    sendCommandToServer( message );
+    auto message = QString("%1 %2\n").arg(command).arg(argumens).toStdString();
+    sendCommandToServer( std::move(message) );
 
     QTimer::singleShot(150, nullptr, [message, command, this]{
     if(command == "start_measure")

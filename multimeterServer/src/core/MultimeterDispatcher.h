@@ -30,11 +30,13 @@ public:
     void initChannels();
     int numberOfMultimeterChannel();
 
-    string dataFromChannel( int id );
-    string channelStatus( int id );
-    string startMeasuringInChannel( int id );
-    string setRangeForChannel( int id, int range );
-    string stopMeasuringInChannel( int id );
+    string dataFromChannel( int&& id );
+    string channelStatus( int&& id );
+    string startMeasuringInChannel( int&& id );
+    string setRangeForChannel( int&& id, int&& range );
+    string stopMeasuringInChannel( int&& id );
+
+    MultimeterDispatcher& operator=(const MultimeterDispatcher&) = delete;
 
 private:
     MultimeterDispatcher();

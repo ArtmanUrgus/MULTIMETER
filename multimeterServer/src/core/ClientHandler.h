@@ -8,7 +8,7 @@ using namespace std;
 class ClientHandler
 {
 public:
-    ClientHandler(int id);
+    ClientHandler(int&& id);
     ~ClientHandler();
 
     void disconnect();

@@ -55,22 +55,22 @@ namespace
 
     string start_measure(int channelId)
     {
-        return multimeter->startMeasuringInChannel(channelId);
+        return multimeter->startMeasuringInChannel(move(channelId));
     }
 
     string stop_measure(int channelId)
     {
-        return multimeter->stopMeasuringInChannel(channelId);
+        return multimeter->stopMeasuringInChannel(move(channelId));
     }
 
     string get_status(int channelId)
     {
-        return multimeter->channelStatus(channelId);
+        return multimeter->channelStatus(move(channelId));
     }
 
     string get_result(int channelId)
     {
-        return multimeter->dataFromChannel(channelId);
+        return multimeter->dataFromChannel(move(channelId));
     }
 
     static unordered_map<string, messageHandler> commands{
@@ -87,9 +87,9 @@ RequestHandler::RequestHandler()
 RequestHandler::~RequestHandler()
 {}
 
-string RequestHandler::handleCommand(string msg)
+string RequestHandler::handleCommand(string&& msg)
 {
-    splitMessage( msg );
+    splitMessage( move(msg) );
 
     auto command = data[0];
     data.erase( data.begin() );
@@ -122,7 +122,7 @@ string RequestHandler::handleCommand(string msg)
 
             if( channelId != invalidValue && rangeId != invalidValue )
             {
-                return multimeter->setRangeForChannel(channelId, rangeId );
+                return multimeter->setRangeForChannel(move(channelId), move(rangeId) );
             }
         }
     }
@@ -130,7 +130,7 @@ string RequestHandler::handleCommand(string msg)
     return "fail\n";
 }
 
-void RequestHandler::splitMessage(string value)
+void RequestHandler::splitMessage(string&& value)
 {
     data.clear();
 

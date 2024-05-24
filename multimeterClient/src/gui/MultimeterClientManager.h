@@ -18,13 +18,13 @@ public:
 
     void init();
 
-    void setStatusForChannel(int channel, int state);
-    void setValueForChannel(int channel, double value);
-    void setRangeForChannel(int channel, int value);
-
 public slots:
     void submitRange(int channel, int value);
     void submitMeasure(int channel, bool buttonState);
+
+    void setStatusForChannel(int channel, int state);
+    void setValueForChannel(int channel, double value);
+    void setRangeForChannel(int channel, int value);
 
 private:
     void initChannels();
@@ -35,10 +35,6 @@ private:
     QQmlApplicationEngine engine;
 
     QVector<ChannelDispatcher*> channels;
-
-    // Агрегаты следующих контейнеров не требуют явного удаления в деструкторе
-    // потому, что являются дочерними объектами QQuickWindow и будут удалены по зарытию окна.
-
     QVector<QHash<int, QObject*>> qmlControl;
     QList<QObject*> rootItems;
 };

@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QStringList>
 
-ChannelDispatcher::ChannelDispatcher(int id, QObject *parent)
+ChannelDispatcher::ChannelDispatcher(int&& id, QObject *parent)
     : QObject{parent}
     , chId{id}
     , channelClient{ new ChannelClient{this, id} }
@@ -46,13 +46,13 @@ float ChannelDispatcher::value()
     return channelResultValue.last();
 }
 
-void ChannelDispatcher::submitRangeChangeRequest(int range)
+void ChannelDispatcher::submitRangeChangeRequest(int&& range)
 {
     channelClient->request(QStringLiteral("set_range"), QString("channel%2, range%3")
                            .arg(chId).arg(range) );
 }
 
-void ChannelDispatcher::submitMessureChangeRequest(bool measureState)
+void ChannelDispatcher::submitMessureChangeRequest(bool&& measureState)
 {
     auto command = QString("%1_measure").arg( measureState ? "start" : "stop");
     channelClient->request(command, QString("channel%2").arg(chId) );
@@ -76,7 +76,7 @@ void ChannelDispatcher::setStatus(int v)
     }
 }
 
-void ChannelDispatcher::setValue(const float& v)
+void ChannelDispatcher::setValue(float v)
 {
     emit valueChanged( chId, v );
 }
