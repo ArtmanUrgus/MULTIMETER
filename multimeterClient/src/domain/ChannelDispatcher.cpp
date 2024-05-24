@@ -95,5 +95,4 @@ void ChannelDispatcher::close()
     channelClient->stop();
 }
 
-#include "ChannelDispatcher.moc"
 #include "moc_ChannelDispatcher.cpp"

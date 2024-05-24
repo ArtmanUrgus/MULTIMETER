@@ -38,6 +38,8 @@ public:
 
     MultimeterDispatcher& operator=(const MultimeterDispatcher&) = delete;
 
+    MultimeterDispatcher &operator=(const MultimeterDispatcher&) = delete;
+
 private:
     MultimeterDispatcher();
     ~MultimeterDispatcher();
