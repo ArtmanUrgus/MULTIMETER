@@ -41,7 +41,7 @@
 
 **Рис. 5 Каналы в состоянии ошибки или занятости**  
 
-[![client-measure-error-busy.png](https://i.postimg.cc/zvdpZ2VT/client-measure-error-busy.png)](https://postimg.cc/vxV55z7m)
+[![client-measure-error-busy.png](https://i.postimg.cc/pLyrtK7x/client-measure-error-busy.png)](https://postimg.cc/sMdsYGs0)
 
 ### Контролер канала
 
